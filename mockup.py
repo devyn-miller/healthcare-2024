@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import altair as alt
+import matplotlib.pyplot as plt
 
 # Initial setup
 st.set_page_config(page_title="Healthcare Investment Experiment", page_icon=":hospital:")
@@ -52,6 +53,31 @@ st.sidebar.header("Achievements")
 st.sidebar.markdown("* Survived a day without a shock: 🏅")
 st.sidebar.markdown("* Reached 60% health: 🏅" if health >= 60 else "* Reach 60% health: ❌")
 st.sidebar.markdown("* Reached 60% enjoyment: 🏅" if enjoyment >= 60 else "* Reach 60% enjoyment: ❌")
+
+# Simulated shock probabilities (for demonstration, replace with dynamic values from your model)
+shock_probabilities = {
+    "No Shock": 0.7,  # 70% probability
+    "Small Shock": 0.2,  # 20% probability
+    "Large Shock": 0.08,  # 8% probability
+    "Death": 0.02  # 2% probability
+}
+
+# Display shock probabilities
+st.subheader("Shock Probabilities")
+for shock_type, probability in shock_probabilities.items():
+    st.metric(label=shock_type, value=f"{probability * 100}%")
+
+# Visualizing shock probabilities
+st.subheader("Shock Probability Distribution")
+
+# Create a bar chart for shock probabilities
+fig, ax = plt.subplots()
+ax.bar(shock_probabilities.keys(), shock_probabilities.values(), color=['green', 'yellow', 'orange', 'red'])
+ax.set_ylabel('Probability')
+ax.set_title('Shock Probability Distribution')
+
+# Display the chart in Streamlit
+st.pyplot(fig)
 
 # Integration with C++ dynamic program
 # This is where you would call your C++ program or API to get the updated health, enjoyment, and shock event based on the user's decision.
