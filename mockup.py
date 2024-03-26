@@ -15,10 +15,19 @@ shock_probability = 0.1
 shock_impact = 20
 
 # Define function to update health and enjoyment based on time allocation
-def update_values(health_time, enjoyment_time):
-    health = initial_health + health_time - shock_impact * np.random.choice([0, 1], p=[1-shock_probability, shock_probability])
+def update_values(health_time, enjoyment_time, shock_probability):
+    shock_event = np.random.choice(["none", "small", "large", "death"], p=[1-shock_probability, shock_probability/3, shock_probability/3, shock_probability/3])
+    if shock_event == "small":
+        health_impact = shock_impact / 2
+    elif shock_event == "large":
+        health_impact = shock_impact
+    elif shock_event == "death":
+        health_impact = initial_health  # Simulates death by setting health to 0
+    else:
+        health_impact = 0
+    health = max(0, initial_health + health_time - health_impact)  # Ensure health doesn't go below 0
     enjoyment = initial_enjoyment + enjoyment_time
-    return health, enjoyment
+    return health, enjoyment, shock_event
 
 # Set up the Streamlit app layout
 st.title("Healthcare Investment Experiment")
@@ -43,6 +52,9 @@ st.write(f"Current time allocation: Health - {health_time}, Enjoyment - {enjoyme
 health_bar = st.empty()
 enjoyment_bar = st.empty()
 
+# Placeholder for shock event notification
+shock_event_placeholder = st.empty()
+
 # Create a button to run the simulation
 if st.button("Run Simulation"):
     # Initialize variables for tracking progress
@@ -51,11 +63,12 @@ if st.button("Run Simulation"):
     time_elapsed = 0
     health_data = []
     enjoyment_data = []
+    consecutive_enjoyment = 0  # Initialize or update your logic for tracking consecutive enjoyment
 
     # Run the simulation
     while time_elapsed < max_time:
         # Update health and enjoyment based on time allocation
-        health, enjoyment = update_values(health_time, enjoyment_time)
+        health, enjoyment, shock_event = update_values(health_time, enjoyment_time, shock_probability)
         
         # Store data for plotting
         health_data.append(health)
@@ -65,12 +78,21 @@ if st.button("Run Simulation"):
         health_bar.progress(health)
         enjoyment_bar.progress(enjoyment)
         
-        # Display numerical values
+        # Display numerical values and shock events
         st.write(f"Health: {health}, Enjoyment: {enjoyment}")
+        if shock_event != "none":
+            shock_event_placeholder.error(f"Shock Event: {shock_event.capitalize()} Shock!")
+        else:
+            shock_event_placeholder.success("No shock event this time.")
         
-        # Increment time
+        # Increment time and shock probability
         time_elapsed += 1
+        shock_probability += 0.001  # Example of increasing shock probability over time
         time.sleep(0.1)
+
+    # After the simulation loop, calculate achievements
+    achievement1_progress = min(100, (health_data[-1]/80)*100) if health_data else 0
+    achievement2_progress = min(100, (consecutive_enjoyment/5)*100) if enjoyment_data else 0
 
     # Display simulation results
     st.subheader("Simulation Results")
@@ -85,6 +107,19 @@ if st.button("Run Simulation"):
     # Provide an option to reset the simulation
     if st.button("Reset Simulation"):
         st.experimental_rerun()
+
+    # Add gamification elements (modified according to instructions)
+    st.sidebar.header("Achievements")
+
+    # Example of visual progress bars for achievements
+    st.sidebar.text("Reached 80% health level")
+    st.sidebar.progress(achievement1_progress)
+
+    st.sidebar.text("Maintained enjoyment above 60% for 5 consecutive time steps")
+    st.sidebar.progress(achievement2_progress)
+
+    st.sidebar.header("Progress Tracker")
+    st.sidebar.progress(70)
 
 # Add tooltips for key concepts
 st.markdown("""
@@ -125,11 +160,18 @@ st.markdown("""
     <span class="tooltiptext">Represents the participant's current enjoyment status.</span>
 </div>
 """, unsafe_allow_html=True)
+def generate_tank_html(shock_probability, max_balls=10):
+    balls_count = int(shock_probability * max_balls)
+    tank_html = '<div style="border: 2px solid #333; height: 100px; width: 50px; padding: 5px;">'
+    for _ in range(balls_count):
+        tank_html += '<div style="background-color: red; height: 8px; width: 8px; border-radius: 50%; margin: 2px;"></div>'
+    for _ in range(max_balls - balls_count):
+        tank_html += '<div style="background-color: green; height: 8px; width: 8px; border-radius: 50%; margin: 2px;"></div>'
+    tank_html += '</div>'
+    return tank_html
 
-# Add gamification elements (placeholder for demonstration)
-st.sidebar.header("Achievements")
-st.sidebar.write("- Reached 80% health level")
-st.sidebar.write("- Maintained enjoyment above 60% for 5 consecutive time steps")
+# Inside the "Run Simulation" button block, after updating the shock probability
+shock_probability_display = st.empty()  # Placeholder for the tank visualization
 
-st.sidebar.header("Progress Tracker")
-st.sidebar.progress(70)
+# Update the visualization with the current shock probability
+shock_probability_display.markdown(generate_tank_html(shock_probability), unsafe_allow_html=True)
