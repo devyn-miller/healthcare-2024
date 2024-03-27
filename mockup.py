@@ -1,8 +1,6 @@
 import streamlit as st
 import numpy as np
-import pandas as pd
-import altair as alt
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 # Initial setup
 st.set_page_config(page_title="Healthcare Investment Experiment", page_icon=":hospital:")
@@ -54,34 +52,30 @@ st.sidebar.markdown("* Survived a day without a shock: 🏅")
 st.sidebar.markdown("* Reached 60% health: 🏅" if health >= 60 else "* Reach 60% health: ❌")
 st.sidebar.markdown("* Reached 60% enjoyment: 🏅" if enjoyment >= 60 else "* Reach 60% enjoyment: ❌")
 
-# Simulated shock probabilities (for demonstration, replace with dynamic values from your model)
-shock_probabilities = {
-    "No Shock": 0.7,  # 70% probability
-    "Small Shock": 0.2,  # 20% probability
-    "Large Shock": 0.08,  # 8% probability
-    "Death": 0.02  # 2% probability
-}
+# Life Progress Slider
+life_progress = st.slider("Life Progress", 0, 100, 50)
 
-# Display shock probabilities
-st.subheader("Shock Probabilities")
-for shock_type, probability in shock_probabilities.items():
-    st.metric(label=shock_type, value=f"{probability * 100}%")
+# Function to calculate dynamic shock probabilities
+def calculate_shock_probabilities(life_progress):
+    # This function should contain the logic to calculate shock probabilities
+    # based on the life progress. For simplicity, we're using static values here.
+    return {
+        "No Shock": max(0.7 - life_progress * 0.005, 0),
+        "Small Shock": 0.2 + life_progress * 0.002,
+        "Large Shock": 0.08 + life_progress * 0.003,
+        "Death": 0.02 + life_progress * 0.001
+    }
 
-# Visualizing shock probabilities
-st.subheader("Shock Probability Distribution")
+# Calculate dynamic shock probabilities based on life progress
+shock_probabilities = calculate_shock_probabilities(life_progress)
 
-# Create a bar chart for shock probabilities
-fig, ax = plt.subplots()
-ax.bar(shock_probabilities.keys(), shock_probabilities.values(), color=['green', 'yellow', 'orange', 'red'])
-ax.set_ylabel('Probability')
-ax.set_title('Shock Probability Distribution')
+# Visualizing dynamic shock probabilities with a Plotly pie chart
+st.subheader("Dynamic Shock Probability Distribution")
 
-# Display the chart in Streamlit
-st.pyplot(fig)
+# Create a dynamic Plotly pie chart for shock probabilities
+fig = go.Figure(data=[go.Pie(labels=list(shock_probabilities.keys()), values=list(shock_probabilities.values()), pull=[0, 0.1, 0.1, 0.2], hole=0.3)])
+fig.update_traces(textinfo='percent+label')
+fig.update_layout(title_text='Dynamic Shock Probability Distribution')
 
-# Integration with C++ dynamic program
-# This is where you would call your C++ program or API to get the updated health, enjoyment, and shock event based on the user's decision.
-# For example:
-# health, enjoyment, shock_event = cpp_simulation.update(decision)
-
-# Displaying the health decline curve and shock probability indicator would require additional logic and visualization tools, potentially integrating with the C++ model's output.
+# Display the dynamic chart in Streamlit using Plotly
+st.plotly_chart(fig, use_container_width=True)
