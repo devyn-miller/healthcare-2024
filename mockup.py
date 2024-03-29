@@ -116,25 +116,43 @@ health_curve_fig.update_layout(title_text='Adjusted Health Curve',
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
-# Function to create stick figure representation for shock probabilities
-def create_stick_figure_representation(shock_probabilities, total_figures=100):
+# Update the stick figure representation to include color coding for different shock types
+def create_colored_stick_figure_representation(shock_probabilities, total_figures=100):
+    # Define colors for each shock type
+    colors = {
+        "No Shock": "green",
+        "Small Shock": "yellow",
+        "Large Shock": "orange",
+        "Death": "red"
+    }
     stick_figure_icon = "👤"  # Unicode character for a stick figure
     stick_figure_representation = {}
     for shock_type, probability in shock_probabilities.items():
         num_figures = int(probability * total_figures)
-        stick_figure_representation[shock_type] = stick_figure_icon * num_figures
+        color = colors.get(shock_type, "black")  # Default to black if shock type is not found
+        # Generate HTML string with colored stick figures
+        figures_html = ''.join([f"<span style='color: {color};'>{stick_figure_icon}</span>" for _ in range(num_figures)])
+        stick_figure_representation[shock_type] = figures_html
     return stick_figure_representation
 
-# Calculate stick figure representations for shock probabilities
-stick_figure_representations = create_stick_figure_representation(shock_probabilities)
+# Calculate colored stick figure representations for shock probabilities
+colored_stick_figure_representations = create_colored_stick_figure_representation(shock_probabilities)
 
-# Display stick figures for each shock probability category
-st.subheader("Stick Figure Probability Representation")
-for shock_type, figures_string in stick_figure_representations.items():
-    st.markdown(f"**{shock_type}:** {figures_string}")
+# Display colored stick figures for each shock probability category using HTML and CSS
+st.markdown("<style>.stick-figure { font-size: 24px; }</style>", unsafe_allow_html=True)
+st.subheader("Colored Stick Figure Probability Representation")
+for shock_type, figures_html in colored_stick_figure_representations.items():
+    st.markdown(f"**{shock_type}:** <div class='stick-figure'>{figures_html}</div>", unsafe_allow_html=True)
 
-# Legend for stick figure representation
-st.markdown(f"Each stick figure represents {100/100:.2f}% probability.")
+# Legend for colored stick figure representation
+st.markdown("""
+    <div class='stick-figure-legend' style='font-size: 24px;'>
+        <div><span style='color: green;'>👤</span> No Shock</div>
+        <div><span style='color: yellow;'>👤</span> Small Shock</div>
+        <div><span style='color: orange;'>👤</span> Large Shock</div>
+        <div><span style='color: red;'>👤</span> Death</div>
+    </div>
+""", unsafe_allow_html=True)
 
 # Placeholder for consistency and variance metrics (implementation example)
 consistency_placeholder = st.empty()
