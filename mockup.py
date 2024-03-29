@@ -2,8 +2,14 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
+# Define icon image paths
+heart_icon = "images/heart-icon.png"
+lightning_icon = "images/lightning-shock-icon.png"
+sunglasses_icon = "images/smile-face-icon.png"
+sunny_icon = "images/no-shock-sunny.png"
+
 # Initial setup
-st.set_page_config(page_title="Healthcare Investment Experiment", page_icon=":hospital:")
+st.set_page_config(page_title="Healthcare Investment Experiment")
 
 # Introduction
 st.title("Healthcare Investment Experiment :hospital:")
