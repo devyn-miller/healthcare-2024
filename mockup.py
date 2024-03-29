@@ -116,41 +116,49 @@ health_curve_fig.update_layout(title_text='Adjusted Health Curve',
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
-# Update the stick figure representation to include color coding for different shock types
-def create_colored_stick_figure_representation(shock_probabilities, total_figures=100):
+# Update the stick figure representation to use SVG for colored figures
+def create_colored_svg_stick_figure_representation(shock_probabilities, total_figures=100):
+    # Define SVG template for a stick figure with a placeholder for color
+    svg_template = """<svg height="20" width="10" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                          <line x1="5" y1="0" x2="5" y2="7" style="stroke:{color};stroke-width:2" />
+                          <circle cx="5" cy="3" r="3" style="fill:{color};stroke:none" />
+                          <line x1="5" y1="10" x2="5" y2="15" style="stroke:{color};stroke-width:2" />
+                          <line x1="2" y1="12" x2="8" y2="12" style="stroke:{color};stroke-width:2" />
+                          <line x1="5" y1="15" x2="2" y2="20" style="stroke:{color};stroke-width:2" />
+                          <line x1="5" y1="15" x2="8" y2="20" style="stroke:{color};stroke-width:2" />
+                      </svg>"""
     # Define colors for each shock type
     colors = {
-        "No Shock": "green",
-        "Small Shock": "yellow",
-        "Large Shock": "orange",
-        "Death": "red"
+        "No Shock": "#00FF00",  # Green
+        "Small Shock": "#FFFF00",  # Yellow
+        "Large Shock": "#FFA500",  # Orange
+        "Death": "#FF0000"  # Red
     }
-    stick_figure_icon = "👤"  # Unicode character for a stick figure
     stick_figure_representation = {}
     for shock_type, probability in shock_probabilities.items():
         num_figures = int(probability * total_figures)
-        color = colors.get(shock_type, "black")  # Default to black if shock type is not found
-        # Generate HTML string with colored stick figures
-        figures_html = ''.join([f"<span style='color: {color};'>{stick_figure_icon}</span>" for _ in range(num_figures)])
-        stick_figure_representation[shock_type] = figures_html
+        color = colors.get(shock_type, "#000000")  # Default to black if shock type is not found
+        # Generate SVG string with colored stick figures
+        figures_svg = ''.join([svg_template.format(color=color) for _ in range(num_figures)])
+        stick_figure_representation[shock_type] = figures_svg
     return stick_figure_representation
 
-# Calculate colored stick figure representations for shock probabilities
-colored_stick_figure_representations = create_colored_stick_figure_representation(shock_probabilities)
+# Calculate colored SVG stick figure representations for shock probabilities
+colored_svg_stick_figure_representations = create_colored_svg_stick_figure_representation(shock_probabilities)
 
-# Display colored stick figures for each shock probability category using HTML and CSS
-st.markdown("<style>.stick-figure { font-size: 24px; }</style>", unsafe_allow_html=True)
-st.subheader("Colored Stick Figure Probability Representation")
-for shock_type, figures_html in colored_stick_figure_representations.items():
-    st.markdown(f"**{shock_type}:** <div class='stick-figure'>{figures_html}</div>", unsafe_allow_html=True)
+# Display colored SVG stick figures for each shock probability category using HTML
+st.markdown("<style>.svg-stick-figure { font-size: 24px; }</style>", unsafe_allow_html=True)
+st.subheader("Colored SVG Stick Figure Probability Representation")
+for shock_type, figures_svg in colored_svg_stick_figure_representations.items():
+    st.markdown(f"**{shock_type}:** <div class='svg-stick-figure'>{figures_svg}</div>", unsafe_allow_html=True)
 
-# Legend for colored stick figure representation
+# Legend for colored SVG stick figure representation
 st.markdown("""
-    <div class='stick-figure-legend' style='font-size: 24px;'>
-        <div><span style='color: green;'>👤</span> No Shock</div>
-        <div><span style='color: yellow;'>👤</span> Small Shock</div>
-        <div><span style='color: orange;'>👤</span> Large Shock</div>
-        <div><span style='color: red;'>👤</span> Death</div>
+    <div class='svg-stick-figure-legend' style='font-size: 24px;'>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#00FF00;stroke:none" /></svg> No Shock</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FFFF00;stroke:none" /></svg> Small Shock</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FFA500;stroke:none" /></svg> Large Shock</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FF0000;stroke:none" /></svg> Death</div>
     </div>
 """, unsafe_allow_html=True)
 
