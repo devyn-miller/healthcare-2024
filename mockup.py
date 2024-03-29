@@ -2,25 +2,19 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 
-# Define icon image paths
-heart_icon = "images/heart-icon.png"
-lightning_icon = "images/lightning-shock-icon.png"
-sunglasses_icon = "images/smile-face-icon.png"
-sunny_icon = "images/no-shock-sunny.png"
-
 # Initial setup
-st.set_page_config(page_title="Healthcare Investment Experiment")
+st.set_page_config(page_title="Healthcare Investment Experiment", page_icon=":hospital:")
 
 # Introduction
 st.title("Healthcare Investment Experiment :hospital:")
 st.markdown("""
-Welcome to the Healthcare Investment Experiment! In this simulation, you will decide how to allocate your time between health investment {heart_icon} and enjoyment investment {sunglasses_icon} to optimize your life enjoyment {sunglasses_icon}. Your health {heart_icon} will naturally decline over time, and you will face random health shocks {lightning_icon} that can affect your health {heart_icon} and enjoyment {sunglasses_icon}.
+Welcome to the Healthcare Investment Experiment! In this simulation, you will decide how to allocate your time between health investment :heart: and enjoyment investment :sunglasses: to optimize your life enjoyment :sunglasses:. Your health :heart: will naturally decline over time, and you will face random health shocks :lightning_cloud: that can affect your health :heart: and enjoyment :sunglasses:.
 """)
 
 # Binary decision making
-decision = st.radio("Choose your investment for today:", ('Health Investment {heart_icon}', 'Enjoyment Investment {sunglasses_icon}'))
+decision = st.radio("Choose your investment for today:", ('Health Investment :heart:', 'Enjoyment Investment :sunglasses:'))
 
-# Placeholder for health and enjoyment bars
+# Placeholder for health :heart: and enjoyment :sunglasses: bars
 health_bar = st.empty()
 enjoyment_bar = st.empty()
 
@@ -31,18 +25,18 @@ shock_event = "None"  # Placeholder for shock event
 # Placeholder for shock event notification
 shock_event_placeholder = st.empty()
 
-
-if decision == 'Health Investment {heart_icon}':
+# Update health :heart: and enjoyment :sunglasses: based on decision
+if decision == 'Health Investment :heart:':
     health += np.random.randint(1, 5)  # Simulate health improvement
 else:
     enjoyment += np.random.randint(1, 5)  # Simulate enjoyment increase
 
 # Randomly determine if a shock event occurs
 if np.random.rand() < 0.1:  # Example probability
-    shock_event = "Small Shock {lightning_icon}"
+    shock_event = "Small Shock :lightning_cloud:"
     health -= np.random.randint(5, 10)
 
-
+# Update health :heart: and enjoyment :sunglasses: bars
 health_bar.progress(health)
 enjoyment_bar.progress(enjoyment)
 
@@ -50,13 +44,13 @@ enjoyment_bar.progress(enjoyment)
 if shock_event != "None":
     shock_event_placeholder.error(f"Shock Event: {shock_event}!")
 else:
-    shock_event_placeholder.success("No shock event today {sunny_icon}.")
+    shock_event_placeholder.success("No shock event today :sunny:.")
 
 # Gamification elements
 st.sidebar.header("Achievements")
-st.sidebar.markdown("* Survived a day without a shock {sunny_icon}: 🏅")
-st.sidebar.markdown("* Reached 60% health {heart_icon}: 🏅" if health >= 60 else "* Reach 60% health {heart_icon}: ❌")
-st.sidebar.markdown("* Reached 60% enjoyment {sunglasses_icon}: 🏅" if enjoyment >= 60 else "* Reach 60% enjoyment {sunglasses_icon}: ❌")
+st.sidebar.markdown("* Survived a day without a shock :sunny:: 🏅")
+st.sidebar.markdown("* Reached 60% health :heart:: 🏅" if health >= 60 else "* Reach 60% health :heart:: ❌")
+st.sidebar.markdown("* Reached 60% enjoyment :sunglasses:: 🏅" if enjoyment >= 60 else "* Reach 60% enjoyment :sunglasses:: ❌")
 
 # Life Progress Slider with a clock emoji
 life_progress = st.slider("Life Progress :clock:", 0, 100, 50, help="Slide to adjust your life progress. This represents your age and overall life experience :clock:.")
@@ -72,7 +66,7 @@ def calculate_shock_probabilities(life_progress, health_investment=50):  # Adjus
     }
 
 # Slider for users to adjust health investment for interactive shock probabilities
-health_investment_slider = st.slider("Adjust Health Investment {heart_icon}", 0, 100, 50, help="Adjust your health investment level. Higher investment increases your health {heart_icon} but may reduce enjoyment {sunglasses_icon}.")
+health_investment_slider = st.slider("Adjust Health Investment :heart:", 0, 100, 50, help="Adjust your health investment level. Higher investment increases your health :heart: but may reduce enjoyment :sunglasses:.")
 
 # Recalculate shock probabilities based on health investment
 shock_probabilities = calculate_shock_probabilities(life_progress, health_investment_slider)
@@ -95,7 +89,7 @@ def adjust_health_curve(parameter, age):
     return adjusted_curve_value
 
 # Slider for users to adjust the health improvement parameter
-parameter_slider = st.slider("Adjust Health Improvement Parameter {heart_icon}", 0.0, 1.0, 0.5)
+parameter_slider = st.slider("Adjust Health Improvement Parameter :heart:", 0.0, 1.0, 0.5)
 
 # Display the adjusted health curve
 age_array = np.arange(0, 100, 1)  # Example age range
@@ -107,23 +101,23 @@ health_curve_fig = go.Figure()
 # Add a scatter plot for the health curve
 health_curve_fig.add_trace(go.Scatter(x=age_array, y=health_curve_values, mode='lines',
                                       line=dict(color='blue', width=3),
-                                      name='Health Curve'))
+                                      name='Health Curve :heart:'))
 
 # Add annotations for critical points
 health_curve_fig.add_annotation(x=50, y=adjust_health_curve(parameter_slider, 50),
-                                text="Critical health investment age",
+                                text="Critical health investment age :heart:",
                                 showarrow=True, arrowhead=1)
 
 # Update layout to add more visual appeal
-health_curve_fig.update_layout(title_text='Adjusted Health Curve {heart_icon}',
+health_curve_fig.update_layout(title_text='Adjusted Health Curve :heart:',
                                xaxis_title='Age',
-                               yaxis_title='Health Score {heart_icon}',
+                               yaxis_title='Health Score :heart:',
                                plot_bgcolor='white')
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
 st.info("""
-The critical age for health investment {heart_icon} is determined based on the point at which additional health investments yield diminishing returns on health improvement. This is visually represented in the health curve and is calculated using a combination of factors including current health status {heart_icon}, age, and previous investment levels.
+The critical age for health investment :heart: is determined based on the point at which additional health investments yield diminishing returns on health improvement. This is visually represented in the health curve and is calculated using a combination of factors including current health status :heart:, age, and previous investment levels.
 """)
 
 # Update the stick figure representation to use SVG for colored figures with an adjusted color scheme
@@ -191,11 +185,11 @@ variance_placeholder.metric(label="Variance Score", value=f"{variance:.2f}")
 
 # Function to provide real-time feedback
 def provide_feedback(health, enjoyment, shock_event):
-    feedback_message = "You did not experience a shock event today {sunny_icon}."
+    feedback_message = "You did not experience a shock event today :sunny:."
     if shock_event != "None":
-        feedback_message += f" You experienced a shock event: {shock_event} {lightning_icon}!"
-    feedback_message += f"\nYour current health is {health} {heart_icon}."
-    feedback_message += f"\nYour current life enjoyment is {enjoyment} {sunglasses_icon}."
+        feedback_message += f" You experienced a shock event: {shock_event} :lightning_cloud:!"
+    feedback_message += f"\nYour current health is {health} :heart:."
+    feedback_message += f"\nYour current life enjoyment is {enjoyment} :sunglasses:."
     return feedback_message
 
 # Display real-time feedback
@@ -204,14 +198,14 @@ st.markdown(feedback, unsafe_allow_html=True)
 
 # Real-Time Feedback with Visual Indicators
 if health < 50:
-    st.markdown(f"<span style='color:red;'>Your current health is {health} {heart_icon}.</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:red;'>Your current health is {health} :heart:.</span>", unsafe_allow_html=True)
 else:
-    st.markdown(f"<span style='color:green;'>Your current health is {health} {heart_icon}.</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:green;'>Your current health is {health} :heart:.</span>", unsafe_allow_html=True)
 
 if enjoyment < 50:
-    st.markdown(f"<span style='color:red;'>Your current life enjoyment is {enjoyment} {sunglasses_icon}.</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:red;'>Your current life enjoyment is {enjoyment} :sunglasses:.</span>", unsafe_allow_html=True)
 else:
-    st.markdown(f"<span style='color:green;'>Your current life enjoyment is {enjoyment} {sunglasses_icon}.</span>", unsafe_allow_html=True)
+    st.markdown(f"<span style='color:green;'>Your current life enjoyment is {enjoyment} :sunglasses:.</span>", unsafe_allow_html=True)
 
 
 # Assuming 'health_curve_fig' is your Plotly figure variable
@@ -219,8 +213,7 @@ health_curve_fig.add_trace(go.Scatter(
     x=[50], y=[adjust_health_curve(parameter_slider, 50)],
     mode='markers',
     marker=dict(size=10, color='LightSkyBlue'),
-    name='Critical Age {heart_icon}',
-    text=["Critical Age for Investment {heart_icon}"],
+    name='Critical Age :heart:',
+    text=["Critical Age for Investment :heart:"],
     hoverinfo='text+x+y'
 ))
-
