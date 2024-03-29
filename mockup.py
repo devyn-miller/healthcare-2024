@@ -53,7 +53,7 @@ st.sidebar.markdown("* Reached 60% health: 🏅" if health >= 60 else "* Reach 6
 st.sidebar.markdown("* Reached 60% enjoyment: 🏅" if enjoyment >= 60 else "* Reach 60% enjoyment: ❌")
 
 # Life Progress Slider
-life_progress = st.slider("Life Progress", 0, 100, 50)
+life_progress = st.slider("Life Progress", 0, 100, 50, help="Slide to adjust your life progress. This represents your age and overall life experience.")
 
 # Function to calculate dynamic shock probabilities
 def calculate_shock_probabilities(life_progress, health_investment=50):  # Adjusted for interactivity
@@ -66,7 +66,7 @@ def calculate_shock_probabilities(life_progress, health_investment=50):  # Adjus
     }
 
 # Slider for users to adjust health investment for interactive shock probabilities
-health_investment_slider = st.slider("Adjust Health Investment", 0, 100, 50)
+health_investment_slider = st.slider("Adjust Health Investment", 0, 100, 50, help="Adjust your health investment level. Higher investment increases your health but may reduce enjoyment.")
 
 # Recalculate shock probabilities based on health investment
 shock_probabilities = calculate_shock_probabilities(life_progress, health_investment_slider)
@@ -116,9 +116,19 @@ health_curve_fig.update_layout(title_text='Adjusted Health Curve',
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
-# Update the stick figure representation to use SVG for colored figures
+st.info("""
+The critical age for health investment is determined based on the point at which additional health investments yield diminishing returns on health improvement. This is visually represented in the health curve and is calculated using a combination of factors including current health status, age, and previous investment levels.
+""")
+
+# Update the stick figure representation to use SVG for colored figures with an adjusted color scheme
 def create_colored_svg_stick_figure_representation(shock_probabilities, total_figures=100):
-    # Define SVG template for a stick figure with a placeholder for color
+    # Adjusted colors for better visibility and to accommodate red-green color blindness
+    colors = {
+        "No Shock": "#800080",  # Purple
+        "Small Shock": "#0000FF",  # Blue
+        "Large Shock": "#FFA500",  # Orange
+        "Death": "#8B0000"  # Dark Red
+    }
     svg_template = """<svg height="20" width="10" version="1.1" xmlns="http://www.w3.org/2000/svg">
                           <line x1="5" y1="0" x2="5" y2="7" style="stroke:{color};stroke-width:2" />
                           <circle cx="5" cy="3" r="3" style="fill:{color};stroke:none" />
@@ -127,38 +137,28 @@ def create_colored_svg_stick_figure_representation(shock_probabilities, total_fi
                           <line x1="5" y1="15" x2="2" y2="20" style="stroke:{color};stroke-width:2" />
                           <line x1="5" y1="15" x2="8" y2="20" style="stroke:{color};stroke-width:2" />
                       </svg>"""
-    # Adjusted colors for better visibility and to accommodate red-green color blindness
-    colors = {
-        "No Shock": "#808080",  # Gray
-        "Small Shock": "#0000FF",  # Blue
-        "Large Shock": "#FFA500",  # Orange
-        "Death": "#D22B2B"  # Red
-    }
     stick_figure_representation = {}
     for shock_type, probability in shock_probabilities.items():
         num_figures = int(probability * total_figures)
         color = colors.get(shock_type, "#000000")  # Default to black if shock type is not found
-        # Generate SVG string with colored stick figures
         figures_svg = ''.join([svg_template.format(color=color) for _ in range(num_figures)])
         stick_figure_representation[shock_type] = figures_svg
     return stick_figure_representation
 
-# Calculate colored SVG stick figure representations for shock probabilities
 colored_svg_stick_figure_representations = create_colored_svg_stick_figure_representation(shock_probabilities)
 
-# Display colored SVG stick figures for each shock probability category using HTML
 st.markdown("<style>.svg-stick-figure { font-size: 24px; }</style>", unsafe_allow_html=True)
 st.subheader("Colored SVG Stick Figure Probability Representation")
 for shock_type, figures_svg in colored_svg_stick_figure_representations.items():
     st.markdown(f"**{shock_type}:** <div class='svg-stick-figure'>{figures_svg}</div>", unsafe_allow_html=True)
 
-# Legend for colored SVG stick figure representation
+# Adjusted legend for colored SVG stick figure representation
 st.markdown("""
     <div class='svg-stick-figure-legend' style='font-size: 24px;'>
-        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#808080;stroke:none" /></svg> No Shock (Gray)</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#800080;stroke:none" /></svg> No Shock (Purple)</div>
         <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#0000FF;stroke:none" /></svg> Small Shock (Blue)</div>
         <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FFA500;stroke:none" /></svg> Large Shock (Orange)</div>
-        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#D22B2B;stroke:none" /></svg> Death (Red)</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#8B0000;stroke:none" /></svg> Death (Dark Red)</div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -204,3 +204,14 @@ if enjoyment < 50:
     st.markdown(f"<span style='color:red;'>Your current enjoyment is {enjoyment}</span>", unsafe_allow_html=True)
 else:
     st.markdown(f"<span style='color:green;'>Your current enjoyment is {enjoyment}</span>", unsafe_allow_html=True)
+
+
+# Assuming 'health_curve_fig' is your Plotly figure variable
+health_curve_fig.add_trace(go.Scatter(
+    x=[50], y=[adjust_health_curve(parameter_slider, 50)],
+    mode='markers',
+    marker=dict(size=10, color='LightSkyBlue'),
+    name='Critical Age',
+    text=["Critical Age for Investment"],
+    hoverinfo='text+x+y'
+))
