@@ -26,15 +26,14 @@ To run the Healthcare Investment Experiment app on your local machine, follow th
 
 1. **Install Streamlit**: Open your terminal or command prompt and install Streamlit using pip:
 
-```pip install streamlit```
+`pip install streamlit`
 
+(Optionally, install all requirements by running the following command in your terminal: ```pip install -r requirements.txt```)
 
 2. **Download the App**: Download the `mockup.py` file from this repository to a directory on your local machine.
-
 3. **Run the App**: Navigate to the directory containing `mockup.py` in your terminal or command prompt. Run the app by executing:
 
-```streamlit run mockup.py```
-
+`streamlit run mockup.py`
 
 This command will start the Streamlit server, and your default web browser should automatically open to the app's URL (typically `http://localhost:8501`).
 
