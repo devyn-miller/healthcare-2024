@@ -116,24 +116,25 @@ health_curve_fig.update_layout(title_text='Adjusted Health Curve',
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
-# Stick Figure Probability Representation
-def create_stick_figure_representation(shock_probabilities):
-    fig = go.Figure()
+# Function to create stick figure representation for shock probabilities
+def create_stick_figure_representation(shock_probabilities, total_figures=100):
+    stick_figure_icon = "👤"  # Unicode character for a stick figure
+    stick_figure_representation = {}
     for shock_type, probability in shock_probabilities.items():
-        num_figures = int(probability * 100)  # Assuming 100 figures represent 100%
-        fig.add_trace(go.Bar(x=[shock_type], y=[num_figures],
-                             marker=dict(color='lightblue'),
-                             name=f"{shock_type} ({probability:.2%})"))
+        num_figures = int(probability * total_figures)
+        stick_figure_representation[shock_type] = stick_figure_icon * num_figures
+    return stick_figure_representation
 
-    fig.update_layout(title_text='Stick Figure Probability Representation',
-                      xaxis_title='Shock Type',
-                      yaxis_title='Number of Stick Figures',
-                      yaxis=dict(range=[0, 100]))  # Assuming 100 is the max number of figures
+# Calculate stick figure representations for shock probabilities
+stick_figure_representations = create_stick_figure_representation(shock_probabilities)
 
-    return fig
+# Display stick figures for each shock probability category
+st.subheader("Stick Figure Probability Representation")
+for shock_type, figures_string in stick_figure_representations.items():
+    st.markdown(f"**{shock_type}:** {figures_string}")
 
-stick_figure_fig = create_stick_figure_representation(shock_probabilities)
-st.plotly_chart(stick_figure_fig, use_container_width=True)
+# Legend for stick figure representation
+st.markdown(f"Each stick figure represents {100/100:.2f}% probability.")
 
 # Placeholder for consistency and variance metrics (implementation example)
 consistency_placeholder = st.empty()
