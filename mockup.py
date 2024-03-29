@@ -56,18 +56,20 @@ st.sidebar.markdown("* Reached 60% enjoyment: 🏅" if enjoyment >= 60 else "* R
 life_progress = st.slider("Life Progress", 0, 100, 50)
 
 # Function to calculate dynamic shock probabilities
-def calculate_shock_probabilities(life_progress):
-    # This function should contain the logic to calculate shock probabilities
-    # based on the life progress. For simplicity, we're using static values here.
+def calculate_shock_probabilities(life_progress, health_investment=50):  # Adjusted for interactivity
+    # Adjusted logic for dynamic shock probabilities
     return {
-        "No Shock": max(0.7 - life_progress * 0.005, 0),
-        "Small Shock": 0.2 + life_progress * 0.002,
-        "Large Shock": 0.08 + life_progress * 0.003,
-        "Death": 0.02 + life_progress * 0.001
+        "No Shock": max(0.7 - life_progress * 0.005 - health_investment * 0.01, 0),
+        "Small Shock": 0.2 + life_progress * 0.002 + health_investment * 0.005,
+        "Large Shock": 0.08 + life_progress * 0.003 + health_investment * 0.002,
+        "Death": 0.02 + life_progress * 0.001 + health_investment * 0.001
     }
 
-# Calculate dynamic shock probabilities based on life progress
-shock_probabilities = calculate_shock_probabilities(life_progress)
+# Slider for users to adjust health investment for interactive shock probabilities
+health_investment_slider = st.slider("Adjust Health Investment", 0, 100, 50)
+
+# Recalculate shock probabilities based on health investment
+shock_probabilities = calculate_shock_probabilities(life_progress, health_investment_slider)
 
 # Visualizing dynamic shock probabilities with a Plotly pie chart
 st.subheader("Dynamic Shock Probability Distribution")
@@ -79,4 +81,26 @@ fig.update_layout(title_text='Dynamic Shock Probability Distribution')
 
 # Display the dynamic chart in Streamlit using Plotly
 st.plotly_chart(fig, use_container_width=True)
-#
+# Function to adjust health curve based on parameter
+def adjust_health_curve(parameter, age):
+    # Placeholder for actual function logic
+    adjusted_curve_value = parameter * 100 / (age + 1)  # Simplified example
+    return adjusted_curve_value
+
+# Slider for users to adjust the health improvement parameter
+parameter_slider = st.slider("Adjust Health Improvement Parameter", 0.0, 1.0, 0.5)
+
+# Display the adjusted health curve
+age_array = np.arange(0, 100, 1)  # Example age range
+health_curve_values = [adjust_health_curve(parameter_slider, age) for age in age_array]
+
+# Plot the health curve
+health_curve_fig = go.Figure(data=[go.Scatter(x=age_array, y=health_curve_values)])
+health_curve_fig.update_layout(title_text='Adjusted Health Curve')
+st.plotly_chart(health_curve_fig, use_container_width=True)
+
+# Real-time feedback on decisions
+feedback = f"Your current health is {health} and enjoyment is {enjoyment}. "
+if shock_event != "None":
+    feedback += f"You experienced a shock event: {shock_event}!"
+st.write(feedback)
