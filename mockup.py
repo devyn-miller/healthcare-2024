@@ -127,12 +127,12 @@ def create_colored_svg_stick_figure_representation(shock_probabilities, total_fi
                           <line x1="5" y1="15" x2="2" y2="20" style="stroke:{color};stroke-width:2" />
                           <line x1="5" y1="15" x2="8" y2="20" style="stroke:{color};stroke-width:2" />
                       </svg>"""
-    # Define colors for each shock type
+    # Adjusted colors for better visibility and to accommodate red-green color blindness
     colors = {
-        "No Shock": "#00FF00",  # Green
-        "Small Shock": "#FFFF00",  # Yellow
+        "No Shock": "#808080",  # Gray
+        "Small Shock": "#0000FF",  # Blue
         "Large Shock": "#FFA500",  # Orange
-        "Death": "#FF0000"  # Red
+        "Death": "#D22B2B"  # Red
     }
     stick_figure_representation = {}
     for shock_type, probability in shock_probabilities.items():
@@ -155,10 +155,10 @@ for shock_type, figures_svg in colored_svg_stick_figure_representations.items():
 # Legend for colored SVG stick figure representation
 st.markdown("""
     <div class='svg-stick-figure-legend' style='font-size: 24px;'>
-        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#00FF00;stroke:none" /></svg> No Shock</div>
-        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FFFF00;stroke:none" /></svg> Small Shock</div>
-        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FFA500;stroke:none" /></svg> Large Shock</div>
-        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FF0000;stroke:none" /></svg> Death</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#808080;stroke:none" /></svg> No Shock (Gray)</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#0000FF;stroke:none" /></svg> Small Shock (Blue)</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#FFA500;stroke:none" /></svg> Large Shock (Orange)</div>
+        <div><svg height="20" width="10"><circle cx="5" cy="3" r="3" style="fill:#D22B2B;stroke:none" /></svg> Death (Red)</div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -185,7 +185,7 @@ variance_placeholder.metric(label="Variance Score", value=f"{variance:.2f}")
 
 # Function to provide real-time feedback
 def provide_feedback(health, enjoyment, shock_event):
-    feedback_message = f"Your current health is {health} and enjoyment is {enjoyment}. "
+    feedback_message = "You did not experience a shock event today."
     if shock_event != "None":
         feedback_message += f"You experienced a shock event: {shock_event}!"
     return feedback_message
