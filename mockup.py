@@ -81,6 +81,7 @@ fig.update_layout(title_text='Dynamic Shock Probability Distribution')
 
 # Display the dynamic chart in Streamlit using Plotly
 st.plotly_chart(fig, use_container_width=True)
+
 # Function to adjust health curve based on parameter
 def adjust_health_curve(parameter, age):
     # Placeholder for actual function logic
@@ -94,13 +95,85 @@ parameter_slider = st.slider("Adjust Health Improvement Parameter", 0.0, 1.0, 0.
 age_array = np.arange(0, 100, 1)  # Example age range
 health_curve_values = [adjust_health_curve(parameter_slider, age) for age in age_array]
 
-# Plot the health curve
-health_curve_fig = go.Figure(data=[go.Scatter(x=age_array, y=health_curve_values)])
-health_curve_fig.update_layout(title_text='Adjusted Health Curve')
+# Enhanced Health Curve Visualization
+health_curve_fig = go.Figure()
+
+# Add a scatter plot for the health curve
+health_curve_fig.add_trace(go.Scatter(x=age_array, y=health_curve_values, mode='lines',
+                                      line=dict(color='blue', width=3),
+                                      name='Health Curve'))
+
+# Add annotations for critical points
+health_curve_fig.add_annotation(x=50, y=adjust_health_curve(parameter_slider, 50),
+                                text="Critical health investment age",
+                                showarrow=True, arrowhead=1)
+
+# Update layout to add more visual appeal
+health_curve_fig.update_layout(title_text='Adjusted Health Curve',
+                               xaxis_title='Age',
+                               yaxis_title='Health Score',
+                               plot_bgcolor='white')
+
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
-# Real-time feedback on decisions
-feedback = f"Your current health is {health} and enjoyment is {enjoyment}. "
-if shock_event != "None":
-    feedback += f"You experienced a shock event: {shock_event}!"
+# Stick Figure Probability Representation
+def create_stick_figure_representation(shock_probabilities):
+    fig = go.Figure()
+    for shock_type, probability in shock_probabilities.items():
+        num_figures = int(probability * 100)  # Assuming 100 figures represent 100%
+        fig.add_trace(go.Bar(x=[shock_type], y=[num_figures],
+                             marker=dict(color='lightblue'),
+                             name=f"{shock_type} ({probability:.2%})"))
+
+    fig.update_layout(title_text='Stick Figure Probability Representation',
+                      xaxis_title='Shock Type',
+                      yaxis_title='Number of Stick Figures',
+                      yaxis=dict(range=[0, 100]))  # Assuming 100 is the max number of figures
+
+    return fig
+
+stick_figure_fig = create_stick_figure_representation(shock_probabilities)
+st.plotly_chart(stick_figure_fig, use_container_width=True)
+
+# Placeholder for consistency and variance metrics (implementation example)
+consistency_placeholder = st.empty()
+variance_placeholder = st.empty()
+
+# Example function to calculate consistency and variance (placeholders for actual logic)
+def calculate_consistency(user_activity_history):
+    return 0.8  # Placeholder value
+
+def calculate_variance(user_activity_history):
+    return 0.1  # Placeholder value
+
+# Example user activity history (placeholder)
+user_activity_history = [1, 2, 3]  # This would be dynamically updated in a real app
+
+# Calculate and display consistency and variance
+consistency = calculate_consistency(user_activity_history)
+variance = calculate_variance(user_activity_history)
+
+consistency_placeholder.metric(label="Consistency Score", value=f"{consistency:.2f}")
+variance_placeholder.metric(label="Variance Score", value=f"{variance:.2f}")
+
+# Function to provide real-time feedback
+def provide_feedback(health, enjoyment, shock_event):
+    feedback_message = f"Your current health is {health} and enjoyment is {enjoyment}. "
+    if shock_event != "None":
+        feedback_message += f"You experienced a shock event: {shock_event}!"
+    return feedback_message
+
+# Display real-time feedback
+feedback = provide_feedback(health, enjoyment, shock_event)
 st.write(feedback)
+
+# Real-Time Feedback with Visual Indicators
+if health < 50:
+    st.markdown(f"<span style='color:red;'>Your current health is {health}</span>", unsafe_allow_html=True)
+else:
+    st.markdown(f"<span style='color:green;'>Your current health is {health}</span>", unsafe_allow_html=True)
+
+if enjoyment < 50:
+    st.markdown(f"<span style='color:red;'>Your current enjoyment is {enjoyment}</span>", unsafe_allow_html=True)
+else:
+    st.markdown(f"<span style='color:green;'>Your current enjoyment is {enjoyment}</span>", unsafe_allow_html=True)
