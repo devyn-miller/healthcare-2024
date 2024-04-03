@@ -83,39 +83,39 @@ fig.update_layout(title_text='Dynamic Shock Probability Distribution')
 st.plotly_chart(fig, use_container_width=True)
 
 # Function to adjust health curve based on parameter
-def gompertz_function(age, health_investment, parameter):
-    return 1 / (np.exp((age - health_investment) * parameter))
+def gompertz_function(age, health_investment, shock_effect, parameter=0.005):
+    # Adjust the parameter to control the shape of the curve
+    base_rate = np.exp(-np.exp(-parameter * (age - (65 + health_investment * 0.2 + shock_effect))))
+    return base_rate
 
 # Slider for users to adjust the health improvement parameter
 parameter_slider = st.slider("Adjust Health Improvement Parameter :heart:", 0.0, 1.0, 0.5)
 
-# Function to adjust health curve based on parameter
-def adjust_health_curve(age_array, health_investment, parameter):
-    # Example implementation. Replace with actual logic.
-    return age_array * health_investment * parameter
-
 # Display the adjusted health curve
 age_array = np.arange(0, 100, 1)  # Example age range
-health_curve_values = adjust_health_curve(age_array, health_investment_slider, parameter_slider)
+shock_effect = -5 if shock_event == "Small Shock :lightning_cloud:" else 0
+participant_curve = [gompertz_function(age, health_investment_slider, shock_effect, parameter_slider) for age in age_array]
+average_curve = [gompertz_function(age, 30, 0, 0.008) for age in age_array]  # Adjusted for a more noticeable difference
 
 # Enhanced Health Curve Visualization
 health_curve_fig = go.Figure()
 
-# Add a scatter plot for the health curve
-health_curve_fig.add_trace(go.Scatter(x=age_array, y=health_curve_values, mode='lines',
+# Add a scatter plot for the participant's health curve
+health_curve_fig.add_trace(go.Scatter(x=age_array, y=participant_curve, mode='lines',
                                       line=dict(color='blue', width=3),
-                                      name='Health Curve'))
+                                      name='Your Health Curve'))
 
-# Add annotations for critical points
-health_curve_fig.add_annotation(x=50, y=adjust_health_curve(age_array, health_investment_slider, parameter_slider)[50],
-                                text="Critical health investment age",
-                                showarrow=True, arrowhead=1)
+# Add a scatter plot for the average health curve
+health_curve_fig.add_trace(go.Scatter(x=age_array, y=average_curve, mode='lines',
+                                      line=dict(color='green', width=3, dash='dash'),
+                                      name='Average Health Curve'))
 
 # Update layout to add more visual appeal
-health_curve_fig.update_layout(title_text='Adjusted Health Curve',
+health_curve_fig.update_layout(title_text='Health Investment Impact on Life Expectancy',
                                xaxis_title='Age',
-                               yaxis_title='Health Score',
-                               plot_bgcolor='white')
+                               yaxis_title='Probability of Living',
+                               plot_bgcolor='white',
+                               yaxis=dict(range=[0, 1]))  # Set the Y-axis range from 0 to 1
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
 
@@ -213,44 +213,6 @@ if enjoyment < 50:
     st.markdown(f"<span style='color:red;'>Your current life enjoyment is {enjoyment} :sunglasses:.</span>", unsafe_allow_html=True)
 else:
     st.markdown(f"<span style='color:green;'>Your current life enjoyment is {enjoyment} :sunglasses:.</span>", unsafe_allow_html=True)
-
-# Assuming 'health_curve_fig' is your Plotly figure variable
-health_curve_fig.add_trace(go.Scatter(
-    x=[50], y=[adjust_health_curve(age_array, health_investment_slider, parameter_slider)[50]],
-    mode='markers',
-    marker=dict(size=10, color='LightSkyBlue'),
-    name='Critical Age :heart:',
-    text=["Critical Age for Investment :heart:"],
-    hoverinfo='text+x+y'
-))
-
-# Function to calculate life expectancy based on current age and health investment
-def calculate_life_expectancy(current_age, health_investment):
-    # Simplified model: Base expectancy at age 50 is 30 years, adjusted by health investment
-    base_expectancy = 80 - current_age  # Assuming base life expectancy of 80 years
-    health_adjustment = (health_investment - 50) * 0.2  # Adjust expectancy by health investment
-    return max(0, base_expectancy + health_adjustment)  # Ensure non-negative expectancy
-
-# Assuming life_progress represents the user's current age
-life_expectancy = calculate_life_expectancy(life_progress, health_investment_slider)
-
-# Display the calculated life expectancy to the user
-st.write(f"Based on your current age and health investment, your expected remaining lifespan is approximately {life_expectancy:.1f} years.")
-
-# Calculate life expectancy based on current age and health investment
-life_expectancy = calculate_life_expectancy(life_progress, health_investment_slider)
-
-# Add a new trace to the health curve figure for life expectancy
-health_curve_fig.add_trace(go.Scatter(
-    x=[life_progress, life_progress + life_expectancy],
-    y=[0, 0],  # Adjust Y-axis values based on your graph's scale
-    mode='lines+markers',
-    name='Projected Life Expectancy',
-    line=dict(color='red', dash='dot'),
-    marker=dict(symbol='diamond', size=8, color='red')
-))
-
-
 
 AVERAGE_LIFE_EXPECTANCY = 75  # Example average life expectancy
 
