@@ -99,6 +99,23 @@ def adjust_score_based_on_variance(mean_score, variance):
 def adjust_health_curve(age_array, health_investment, parameter):
     return [gompertz_function(age, health_investment, parameter) for age in age_array]
 
+# Example function to calculate consistency and variance (placeholders for actual logic)
+def calculate_consistency(user_activity_history):
+    if len(user_activity_history) < 2:
+        return 1.0  # Maximum consistency when there's insufficient data to compare
+
+    differences = np.diff(user_activity_history)  # Calculate the difference between each consecutive activity
+    variance = np.var(differences)  # Calculate the variance of these differences
+
+    # Consistency can be inversely related to variance; lower variance in activities indicates higher consistency
+    # Normalize the consistency score to be between 0 and 1, where 1 is maximum consistency
+    # Assuming a hypothetical maximum variance to normalize against, which might need adjustment based on data
+    max_variance = 10  # This is an arbitrary value and should be adjusted based on the expected range of user activities
+    normalized_variance = min(variance / max_variance, 1)  # Ensure the ratio doesn't exceed 1
+
+    consistency = 1 - normalized_variance  # Invert so that lower variance results in higher consistency
+    return consistency
+
 # Slider for users to adjust the health improvement parameter
 parameter_slider = st.slider("Adjust Health Improvement Parameter :heart:", 0.0, 1.0, 0.5)
 
@@ -177,15 +194,11 @@ st.markdown("""
 consistency_placeholder = st.empty()
 variance_placeholder = st.empty()
 
-# Example function to calculate consistency and variance (placeholders for actual logic)
-def calculate_consistency(user_activity_history):
-    return 0.8  # Placeholder value
 
-def calculate_variance(user_activity_history):
-    return 0.1  # Placeholder value
+
 
 # Example user activity history (placeholder)
-user_activity_history = [1, 2, 3]  # This would be dynamically updated in a real app
+user_activity_history = [1, 2, 3, 4, 5]  # This would be dynamically updated in a real app
 
 # Calculate and display consistency and variance
 consistency = calculate_consistency(user_activity_history)
