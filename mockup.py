@@ -53,7 +53,7 @@ st.sidebar.markdown("* Reached 60% health :heart:: 🏅" if health >= 60 else "*
 st.sidebar.markdown("* Reached 60% enjoyment :sunglasses:: 🏅" if enjoyment >= 60 else "* Reach 60% enjoyment :sunglasses:: ❌")
 
 # Life Progress Slider with a clock emoji
-life_progress = st.slider("Life Progress :clock:", 0, 100, 50, help="Slide to adjust your life progress. This represents your age and overall life experience :clock:.")
+life_progress = st.slider("Life Progress :time:", 0, 100, 50, help="Slide to adjust your life progress. This represents your age and overall life experience :clock:.")
 
 # Function to calculate dynamic shock probabilities
 def calculate_shock_probabilities(life_progress, health_investment=50):  # Adjusted for interactivity
@@ -86,49 +86,13 @@ st.plotly_chart(fig, use_container_width=True)
 def gompertz_function(age, health_investment, parameter):
     return 1 / (np.exp((age - health_investment) * parameter))
 
-def calculate_mean(user_activity_history):
-    return np.mean(user_activity_history)
-
-def calculate_variance(user_activity_history):
-    return np.var(user_activity_history)
-
-def adjust_score_based_on_variance(mean_score, variance):
-    adjusted_score = mean_score * (1 - variance)
-    return adjusted_score
-
-def adjust_health_curve(age_array, health_investment, parameter):
-    return [gompertz_function(age, health_investment, parameter) for age in age_array]
-
-# Example function to calculate consistency and variance (placeholders for actual logic)
-def calculate_consistency(user_activity_history):
-    if len(user_activity_history) < 2:
-        # If there's not enough data, return a default value or consider the consistency undefined
-        return np.nan  # Indicates undefined consistency due to insufficient data
-
-    differences = np.diff(user_activity_history)  # Calculate the difference between each consecutive activity
-    if len(differences) == 0:
-        # This case occurs if user_activity_history has exactly 2 elements, resulting in a single difference value
-        return 1.0  # Assuming perfect consistency for a single observed change
-
-    variance = np.var(differences)  # Calculate the variance of these differences
-
-    # Dynamically adjust max_variance based on the observed data
-    # Here, we use the 75th percentile of the observed variances as a dynamic threshold
-    # This approach assumes you have a collection of variance values from different users or different periods
-    # For demonstration, let's assume a static value, but in practice, you'd calculate this from your data
-    observed_variances = [variance]  # Placeholder for a collection of observed variances
-    max_variance = np.percentile(observed_variances, 75)
-
-    # Ensure max_variance is not zero to avoid division by zero
-    max_variance = max(max_variance, 1e-5)  # Use a small epsilon value as the minimum to avoid division by zero
-
-    normalized_variance = min(variance / max_variance, 1)  # Normalize and ensure it doesn't exceed 1
-
-    consistency = 1 - normalized_variance  # Invert so that lower variance results in higher consistency
-    return consistency
-
 # Slider for users to adjust the health improvement parameter
 parameter_slider = st.slider("Adjust Health Improvement Parameter :heart:", 0.0, 1.0, 0.5)
+
+# Function to adjust health curve based on parameter
+def adjust_health_curve(age_array, health_investment, parameter):
+    # Example implementation. Replace with actual logic.
+    return age_array * health_investment * parameter
 
 # Display the adjusted health curve
 age_array = np.arange(0, 100, 1)  # Example age range
@@ -140,17 +104,17 @@ health_curve_fig = go.Figure()
 # Add a scatter plot for the health curve
 health_curve_fig.add_trace(go.Scatter(x=age_array, y=health_curve_values, mode='lines',
                                       line=dict(color='blue', width=3),
-                                      name='Health Curve :heart:'))
+                                      name='Health Curve'))
 
 # Add annotations for critical points
-health_curve_fig.add_annotation(x=50, y=adjust_health_curve(parameter_slider, 50),
-                                text="Critical health investment age :heart:",
+health_curve_fig.add_annotation(x=50, y=adjust_health_curve(age_array, health_investment_slider, parameter_slider)[50],
+                                text="Critical health investment age",
                                 showarrow=True, arrowhead=1)
 
 # Update layout to add more visual appeal
-health_curve_fig.update_layout(title_text='Adjusted Health Curve :heart:',
+health_curve_fig.update_layout(title_text='Adjusted Health Curve',
                                xaxis_title='Age',
-                               yaxis_title='Health Score :heart:',
+                               yaxis_title='Health Score',
                                plot_bgcolor='white')
 
 st.plotly_chart(health_curve_fig, use_container_width=True)
@@ -201,13 +165,23 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Placeholder for consistency and variance metrics (implementation example)
-consistency_placeholder = st.empty()
-variance_placeholder = st.empty()
+# Actual implementation for consistency and variance metrics
+def calculate_consistency(data):
+    # Actual consistency calculation logic
+    return sum(data) / len(data)  # Example calculation
 
+def calculate_variance(data):
+    # Actual variance calculation logic
+    mean = sum(data) / len(data)
+    variance = sum((x - mean) ** 2 for x in data) / len(data)
+    return variance  # Example calculation
 
 # Example user activity history (placeholder)
 user_activity_history = [1, 2, 3, 4, 5]  # This would be dynamically updated in a real app
+
+# Define placeholders for consistency and variance metrics
+consistency_placeholder = st.empty()
+variance_placeholder = st.empty()
 
 # Calculate and display consistency and variance
 consistency = calculate_consistency(user_activity_history)
@@ -240,13 +214,56 @@ if enjoyment < 50:
 else:
     st.markdown(f"<span style='color:green;'>Your current life enjoyment is {enjoyment} :sunglasses:.</span>", unsafe_allow_html=True)
 
-
 # Assuming 'health_curve_fig' is your Plotly figure variable
 health_curve_fig.add_trace(go.Scatter(
-    x=[50], y=[adjust_health_curve(parameter_slider, 50)],
+    x=[50], y=[adjust_health_curve(age_array, health_investment_slider, parameter_slider)[50]],
     mode='markers',
     marker=dict(size=10, color='LightSkyBlue'),
     name='Critical Age :heart:',
     text=["Critical Age for Investment :heart:"],
     hoverinfo='text+x+y'
 ))
+
+# Function to calculate life expectancy based on current age and health investment
+def calculate_life_expectancy(current_age, health_investment):
+    # Simplified model: Base expectancy at age 50 is 30 years, adjusted by health investment
+    base_expectancy = 80 - current_age  # Assuming base life expectancy of 80 years
+    health_adjustment = (health_investment - 50) * 0.2  # Adjust expectancy by health investment
+    return max(0, base_expectancy + health_adjustment)  # Ensure non-negative expectancy
+
+# Assuming life_progress represents the user's current age
+life_expectancy = calculate_life_expectancy(life_progress, health_investment_slider)
+
+# Display the calculated life expectancy to the user
+st.write(f"Based on your current age and health investment, your expected remaining lifespan is approximately {life_expectancy:.1f} years.")
+
+# Calculate life expectancy based on current age and health investment
+life_expectancy = calculate_life_expectancy(life_progress, health_investment_slider)
+
+# Add a new trace to the health curve figure for life expectancy
+health_curve_fig.add_trace(go.Scatter(
+    x=[life_progress, life_progress + life_expectancy],
+    y=[0, 0],  # Adjust Y-axis values based on your graph's scale
+    mode='lines+markers',
+    name='Projected Life Expectancy',
+    line=dict(color='red', dash='dot'),
+    marker=dict(symbol='diamond', size=8, color='red')
+))
+
+
+
+AVERAGE_LIFE_EXPECTANCY = 75  # Example average life expectancy
+
+# Add a new trace for the average life expectancy
+health_curve_fig.add_trace(go.Scatter(
+    x=[0, 100],  # Assuming the x-axis represents age from 0 to 100
+    y=[AVERAGE_LIFE_EXPECTANCY, AVERAGE_LIFE_EXPECTANCY],
+    mode='lines',
+    name='Average Life Expectancy',
+    line=dict(color='green', dash='dash'),
+))
+
+# Update layout to reflect the addition
+health_curve_fig.update_layout(title_text='Adjusted Health Curve with Projected and Average Life Expectancy')
+
+st.plotly_chart(health_curve_fig, use_container_width=True)
