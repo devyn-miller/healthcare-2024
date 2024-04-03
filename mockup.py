@@ -102,16 +102,27 @@ def adjust_health_curve(age_array, health_investment, parameter):
 # Example function to calculate consistency and variance (placeholders for actual logic)
 def calculate_consistency(user_activity_history):
     if len(user_activity_history) < 2:
-        return 1.0  # Maximum consistency when there's insufficient data to compare
+        # If there's not enough data, return a default value or consider the consistency undefined
+        return np.nan  # Indicates undefined consistency due to insufficient data
 
     differences = np.diff(user_activity_history)  # Calculate the difference between each consecutive activity
+    if len(differences) == 0:
+        # This case occurs if user_activity_history has exactly 2 elements, resulting in a single difference value
+        return 1.0  # Assuming perfect consistency for a single observed change
+
     variance = np.var(differences)  # Calculate the variance of these differences
 
-    # Consistency can be inversely related to variance; lower variance in activities indicates higher consistency
-    # Normalize the consistency score to be between 0 and 1, where 1 is maximum consistency
-    # Assuming a hypothetical maximum variance to normalize against, which might need adjustment based on data
-    max_variance = 10  # This is an arbitrary value and should be adjusted based on the expected range of user activities
-    normalized_variance = min(variance / max_variance, 1)  # Ensure the ratio doesn't exceed 1
+    # Dynamically adjust max_variance based on the observed data
+    # Here, we use the 75th percentile of the observed variances as a dynamic threshold
+    # This approach assumes you have a collection of variance values from different users or different periods
+    # For demonstration, let's assume a static value, but in practice, you'd calculate this from your data
+    observed_variances = [variance]  # Placeholder for a collection of observed variances
+    max_variance = np.percentile(observed_variances, 75)
+
+    # Ensure max_variance is not zero to avoid division by zero
+    max_variance = max(max_variance, 1e-5)  # Use a small epsilon value as the minimum to avoid division by zero
+
+    normalized_variance = min(variance / max_variance, 1)  # Normalize and ensure it doesn't exceed 1
 
     consistency = 1 - normalized_variance  # Invert so that lower variance results in higher consistency
     return consistency
@@ -193,8 +204,6 @@ st.markdown("""
 # Placeholder for consistency and variance metrics (implementation example)
 consistency_placeholder = st.empty()
 variance_placeholder = st.empty()
-
-
 
 
 # Example user activity history (placeholder)
