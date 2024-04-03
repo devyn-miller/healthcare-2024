@@ -10,6 +10,51 @@ This Streamlit application simulates a Healthcare Investment Experiment where us
 
 ## Features
 
+The `mockup.py` Streamlit app allows users to make daily investment decisions between health and enjoyment, simulates the impact of these decisions along with random health shocks, and visualizes the outcomes. Here's a breakdown of its components and functions:
+
+### Initial Setup and Introduction
+- **Streamlit Configuration**: The page is configured with a title and icon.
+- **Introduction Section**: Presents the experiment's purpose and mechanics to the user.
+
+### Decision Making
+- **Binary Decision**: Users choose between investing in health or enjoyment for the day.
+
+### Simulation Mechanics
+- **Health and Enjoyment Tracking**: Initializes placeholders for displaying health and enjoyment progress bars.
+- **Daily Simulation**: Simulates the effect of the user's decision on health and enjoyment, including the possibility of a random shock event affecting health.
+
+### Shock Event Handling
+- **Shock Event Simulation**: Randomly determines if a shock event occurs each day and updates health accordingly.
+- **Shock Event Notification**: Displays a notification about the shock event, if any.
+
+### Gamification and Progress Tracking
+- **Achievements**: Displays achievements based on health and enjoyment levels.
+- **Life Progress Slider**: Allows users to adjust their life progress, simulating aging.
+
+### Dynamic Shock Probabilities
+- **`calculate_shock_probabilities` Function**: Calculates the probabilities of different shock events based on the user's life progress and health investment.
+- **Health Investment Slider**: Lets users adjust their health investment level, affecting shock probabilities.
+- **Shock Probability Visualization**: Uses a Plotly pie chart to visualize the dynamic shock probabilities.
+
+### Health Curve Adjustment
+- **`gompertz_function` Function**: Defines a Gompertz function to model the health curve based on age and health investment.
+- **Health Curve Visualization**: Visualizes the adjusted health curve using a Plotly scatter plot, highlighting the critical age for health investment.
+
+### Consistency and Variance Metrics
+- **`calculate_consistency` Function**: Calculates the consistency of user activity based on the variance of differences in activity levels.
+- **Consistency and Variance Display**: Shows the calculated consistency and variance metrics to the user.
+
+### Real-Time Feedback
+- **`provide_feedback` Function**: Generates a feedback message based on the day's events, health, and enjoyment levels.
+- **Visual Indicators**: Displays health and enjoyment levels with color-coded visual indicators for immediate feedback.
+
+### SVG Stick Figure Representation
+- **`create_colored_svg_stick_figure_representation` Function**: Generates SVG representations of shock probabilities with color coding for better visibility and accessibility.
+- **SVG Stick Figure Display**: Shows the SVG stick figures representing shock probabilities and includes a legend for interpretation.
+
+
+
+## User-End
 - **Decision Making**: Choose daily investments in health or enjoyment.
 - **Health and Enjoyment Tracking**: Visual progress bars update based on your decisions.
 - **Shock Events**: Randomly occurring events that can negatively impact your health.
@@ -28,7 +73,7 @@ To run the Healthcare Investment Experiment app on your local machine, follow th
 
 `pip install streamlit`
 
-(Optionally, install all requirements by running the following command in your terminal: ```pip install -r requirements.txt```)
+(Optionally, install all requirements by running the following command in your terminal: `pip install -r requirements.txt`)
 
 2. **Download the App**: Download the `mockup.py` file from this repository to a directory on your local machine.
 3. **Run the App**: Navigate to the directory containing `mockup.py` in your terminal or command prompt. Run the app by executing:
