@@ -83,17 +83,28 @@ fig.update_layout(title_text='Dynamic Shock Probability Distribution')
 st.plotly_chart(fig, use_container_width=True)
 
 # Function to adjust health curve based on parameter
-def adjust_health_curve(parameter, age):
-    # Placeholder for actual function logic
-    adjusted_curve_value = parameter * 100 / (age + 1)  # Simplified example
-    return adjusted_curve_value
+def gompertz_function(age, health_investment, parameter):
+    return 1 / (np.exp((age - health_investment) * parameter))
+
+def calculate_mean(user_activity_history):
+    return np.mean(user_activity_history)
+
+def calculate_variance(user_activity_history):
+    return np.var(user_activity_history)
+
+def adjust_score_based_on_variance(mean_score, variance):
+    adjusted_score = mean_score * (1 - variance)
+    return adjusted_score
+
+def adjust_health_curve(age_array, health_investment, parameter):
+    return [gompertz_function(age, health_investment, parameter) for age in age_array]
 
 # Slider for users to adjust the health improvement parameter
 parameter_slider = st.slider("Adjust Health Improvement Parameter :heart:", 0.0, 1.0, 0.5)
 
 # Display the adjusted health curve
 age_array = np.arange(0, 100, 1)  # Example age range
-health_curve_values = [adjust_health_curve(parameter_slider, age) for age in age_array]
+health_curve_values = adjust_health_curve(age_array, health_investment_slider, parameter_slider)
 
 # Enhanced Health Curve Visualization
 health_curve_fig = go.Figure()
