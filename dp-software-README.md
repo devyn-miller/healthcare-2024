@@ -14,18 +14,17 @@ This project is focused on healthcare analytics, specifically dealing with chron
 
 ### Compilation
 
-To compile the project, follow these steps:
+To compile the project, clone and then follow these steps:
 
-1. Clone the repository and navigate to the project directory.
-2. Create a build directory and navigate into it:
+1. Create a build directory and navigate into it:
     ```shell
     mkdir build && cd build
     ```
-3. Run CMake to configure the project:
+2. Run CMake to configure the project:
     ```shell
     cmake ..
     ```
-4. Build the project using Make:
+3. Build the project using Make:
     ```shell
     make
     ```
